@@ -84,21 +84,26 @@ describe Repository do
   end
 
   context "with stash repository" do
+    before do
+      allow(Settings).to receive(:stash_host).and_return('stash.example.com')
+    end
+
+    let(:repo) {
+      Repository.new(url: "https://stash.example.com/scm/myproject/myrepo.git")
+    }
+
     context "#repository_name" do
       it "returns the repositories name" do
-        repo = Repository.new(:url => "ssh://git@stash.squareup.com:7999/pe/host-tools.git")
-        repo.repository_name.should == "host-tools"
+        repo.repository_name.should == "myrepo"
       end
     end
 
     context '.project_params' do
       it 'parses out pertinent information' do
-        repo = Repository.new(:url => "ssh://git@stash.squareup.com:7999/pe/host-tools.git")
         expect(repo.project_params).to eq(
-          host:       'stash.squareup.com',
-          port:       7999,
-          username:   'pe',
-          repository: 'host-tools'
+          host:       'stash.example.com',
+          username:   'myproject',
+          repository: 'myrepo'
         )
       end
     end

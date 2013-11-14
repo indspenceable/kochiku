@@ -8,12 +8,33 @@ module RemoteServer
   class Github
     attr_reader :repo
 
+    URL_PARSERS = {
+      "git@" => /@(.*):(.*)\/(.*)\.git/,
+      "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
+      "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
+    }
+
     def self.match?(url)
-      url.include?('git.squareup.com') || url.include?('github.com')
+      Settings.github_hosts.any? {|host| url.include?(host) }
     end
 
     def self.convert_to_ssh_url(params)
       "git@#{params[:host]}:#{params[:username]}/#{params[:repository]}.git"
+    end
+
+    def self.project_params(url)
+      parser = URL_PARSERS[url.slice(0,4)]
+      match = url.match(parser)
+
+      if match
+        {
+          host:       match[1],
+          username:   match[2],
+          repository: match[3]
+        }
+      else
+        raise UnknownUrl, "Do not recognize #{url} as a github url."
+      end
     end
 
     def initialize(repo)

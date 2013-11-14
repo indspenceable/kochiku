@@ -58,7 +58,7 @@ describe BuildPart do
   end
 
   describe "#job_args" do
-    let(:repository) { FactoryGirl.create(:repository, :url => "git@git.example.com:org/test-repo.git") }
+    let(:repository) { FactoryGirl.create(:repository, :url => "git@github.com:org/test-repo.git") }
 
     it "should substitute the git mirror if it is specified" do
       Settings.stub(:git_mirror).and_return("git://git-mirror.example.com/")

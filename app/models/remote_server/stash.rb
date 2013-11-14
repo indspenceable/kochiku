@@ -8,6 +8,20 @@ module RemoteServer
       Settings.stash_host && url.include?(Settings.stash_host)
     end
 
+    def self.project_params(url)
+      match = url.match(%r{https://([^@]+)/scm/(.+)/(.+)\.git})
+
+      if match
+        {
+          host:       match[1],
+          username:   match[2],
+          repository: match[3],
+        }
+      else
+        raise UnknownUrl, "Do not recognize #{url} as a stash HTTPS url."
+      end
+    end
+
     def self.convert_to_ssh_url(params)
       "git@#{params[:host]}:#{params[:port]}/#{params[:username].downcase}/#{params[:repository]}.git"
     end

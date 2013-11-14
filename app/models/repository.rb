@@ -1,12 +1,6 @@
 class Repository < ActiveRecord::Base
   UnknownServer = Class.new(RuntimeError)
 
-  URL_PARSERS = {
-    "git@" => /@(.*):(.*)\/(.*)\.git/,
-    "git:" => /:\/\/(.*)\/(.*)\/(.*)\.git/,
-    "http" => /https?:\/\/(.*)\/(.*)\/([^.]*)\.?/,
-    'ssh:' => %r{ssh://git@(.*):(\d+)/(.*)/([^.]+)\.git}
-  }
   has_many :projects, :dependent => :destroy
   validates_presence_of :url
   validates_numericality_of :timeout, :only_integer => true
@@ -86,23 +80,6 @@ class Repository < ActiveRecord::Base
   private
 
   def self.project_params(url)
-    # TODO: Move these parsers to RemoteServer classes.
-    parser = URL_PARSERS[url.slice(0,4)]
-    match = url.match(parser)
-
-    if match.length > 4
-      {
-        host:       match[1],
-        port:       match[2].to_i,
-        username:   match[3],
-        repository: match[4]
-      }
-    else
-      {
-        host:       match[1],
-        username:   match[2],
-        repository: match[3]
-      }
-    end
+    remote_server(url).project_params(url)
   end
 end

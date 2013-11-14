@@ -62,4 +62,9 @@ class SettingsAccessor
   def git_pair_email_prefix
     @hash[:git_pair_email_prefix]
   end
+
+  def github_hosts
+    # TODO: Upgrade our config and remove this Square-specific default.
+    @hash.fetch(:github_hosts, %w(git.squareup.com github.com))
+  end
 end

@@ -30,4 +30,14 @@ describe RemoteServer::Github do
       server.promote_branch!('deployable-myapp', 'abc123')
     end
   end
+
+  describe '.project_params' do
+    it 'raises UnknownUrl for invalid urls' do
+      # This is current behaviour, though if you want to add support for it
+      # that would be cool.
+      expect { described_class.project_params \
+        "https://github.com/blah"
+      }.to raise_error(UnknownUrl)
+    end
+  end
 end
